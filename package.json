@@ -1,0 +1,24 @@
+{
+  "name": "sfacts",
+  "version": "0.0.3",
+  "description": "Facts for SuperScript engine",
+  "main": "index.js",
+  "dependencies": {
+    "async": "^0.9.0",
+    "debug": "^2.1.0",
+    "level": "^0.18.0",
+    "level-sublevel": "^6.3.15",
+    "levelgraph": "^0.9.2",
+    "levelgraph-recursive": "^0.0.1",
+    "levelup": "^0.19.0",
+    "string": "^2.2.0",
+    "sublevel": "^2.4.0",
+    "underscore": "^1.7.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rob Ellis",
+  "license": "ISC"
+}
