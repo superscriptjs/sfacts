@@ -1,6 +1,6 @@
 {
   "name": "sfacts",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Facts for SuperScript engine",
   "main": "index.js",
   "repositories": {
