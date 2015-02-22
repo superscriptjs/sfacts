@@ -18,13 +18,18 @@
     "levelgraph-recursive": "^0.0.1",
     "levelup": "^0.19.0",
     "natural": "^0.2.0",
+    "node-wordnet": "^0.1.5",
     "string": "^2.2.0",
     "sublevel": "^2.4.0",
     "underscore": "^1.7.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^2.1.0",
+    "rmdir": "^1.1.0",
+    "should": "^5.0.1"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test -R spec -s 1700 -t 30000"
   },
   "author": "Rob Ellis",
   "license": "ISC"
