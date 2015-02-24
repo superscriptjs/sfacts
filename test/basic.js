@@ -50,10 +50,15 @@ describe('SuperScript substitution Interface', function(){
     });
     
 
-
-    // it("name subsitution - 2", function(done) {
-    //   done();
-    // });
+    it.only("load new file", function(done) {
+      var files = ['./test/data/names.top']
+      gFacts.loadFile(files, function(err, concept){
+        gFacts.findParentConcepts("sydney", function(e,r){
+          r.should.eql(['girl_names'])
+          done();
+        });
+      });
+    });
 
   });
 
