@@ -50,7 +50,7 @@ describe('SuperScript substitution Interface', function(){
     });
     
 
-    it.only("load new file", function(done) {
+    it("load new file", function(done) {
       var files = ['./test/data/names.top']
       gFacts.loadFile(files, function(err, concept){
         gFacts.findParentConcepts("sydney", function(e,r){
