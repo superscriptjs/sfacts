@@ -5,7 +5,7 @@ var rmdir = require("rmdir");
 var facts = require("../");
 var gFacts;
 
-var data = ['./test/data/concepts_sm.top']
+var data = ['./test/data/concepts_sm.top'];
 
 describe('SuperScript substitution Interface', function(){
 
@@ -15,15 +15,15 @@ describe('SuperScript substitution Interface', function(){
       done();
     });
   });
- 
+
   describe('Find Knowledge', function(){
-    
+
     // Given a concept, lets get all words that reference this concept
     it("expand terms - simple", function(done) {
       gFacts.conceptToList("air", function(err, items){
         items.should.have.length(3);
         items.should.eql([ 'air', 'atmosphere', 'oxygen' ]);
-        done();  
+        done();
       });
     });
 
@@ -48,13 +48,13 @@ describe('SuperScript substitution Interface', function(){
         done();
       });
     });
-    
+
 
     it("load new file", function(done) {
-      var files = ['./test/data/names.top']
+      var files = ['./test/data/names.top'];
       gFacts.loadFile(files, function(err, concept){
         gFacts.findParentConcepts("sydney", function(e,r){
-          r.should.eql(['girl_names'])
+          r.should.eql(['girl_names']);
           done();
         });
       });
@@ -87,7 +87,7 @@ describe('SuperScript substitution Interface', function(){
 // });
 
 // sfacts.db.on('put',function(op){
-// 	console.log("Fired")	
+// 	console.log("Fired")
 // })
 
 // var gtriple = {subject:"my", predicate:"name"};
@@ -103,6 +103,6 @@ describe('SuperScript substitution Interface', function(){
 // 			console.log(r);
 // 			process.exit();
 // 		})
-		
+
 // 	});
 // });
