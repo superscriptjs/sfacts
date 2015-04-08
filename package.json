@@ -1,6 +1,6 @@
 {
   "name": "sfacts",
-  "version": "0.0.10",
+  "version": "0.0.12",
   "description": "Facts for SuperScript engine",
   "main": "index.js",
   "repositories": {
@@ -13,11 +13,11 @@
     "level": "^0.18.0",
     "level-sublevel": "6.4",
     "leveldown": "^0.10.2",
-    "levelgraph": "^0.10.2",
+    "levelgraph": "0.10.4",
     "levelgraph-recursive": "^0.0.1",
     "levelup": "^0.19.0",
     "natural": "^0.2.0",
-    "node-wordnet": "^0.1.5",
+    "node-wordnet": "0.1.7",
     "string": "^2.2.0",
     "sublevel": "^2.4.0",
     "underscore": "^1.7.0"
