@@ -12,6 +12,7 @@
     "debug": "^2.1.0",
     "level": "^0.18.0",
     "level-sublevel": "6.4",
+    "leveldb-json": "0.0.5",
     "leveldown": "^0.10.2",
     "levelgraph": "0.10.4",
     "levelgraph-recursive": "^0.0.1",
