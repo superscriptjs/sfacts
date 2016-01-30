@@ -1,9 +1,9 @@
 {
   "name": "sfacts",
-  "version": "0.0.14",
+  "version": "0.1.0",
   "description": "Facts for SuperScript engine",
   "main": "index.js",
-  "repositories": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/silentrob/sfacts"
   },
@@ -13,8 +13,7 @@
     "level": "^0.18.0",
     "level-sublevel": "6.4",
     "leveldb-json": "0.0.5",
-    "leveldown": "^0.10.2",
-    "levelgraph": "0.10.4",
+    "levelgraph": "1.1.0",
     "levelgraph-recursive": "^0.0.1",
     "levelup": "^0.19.0",
     "natural": "^0.2.0",
