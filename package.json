@@ -33,5 +33,14 @@
     "test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec test -s 1700 -t 30000"
   },
   "author": "Rob Ellis",
-  "license": "ISC"
+  "contributors": [
+    "Rob Ellis <rob@silentrob.me>",
+    "John Wehr <johnwehr@gmail.com>"
+  ],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://raw.github.com/silentrob/sfacts/master/LICENSE"
+    }
+  ]
 }
