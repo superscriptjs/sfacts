@@ -13,13 +13,18 @@ describe('System', function(){
     });
   });
 
-  xit("should create a database synchronously.", function(done) {
-    var db = facts.create('systemDB2');
-    facts.db('systemDB2').close(function(err){
-      rmdir('systemDB2', function(){
-        done();
-      });
-    });
+  it("should create a database synchronously.", function(done) {
+    var db = facts.create('systemDB3');
+    var openCheckInterval = setInterval(function(){
+      if(db.db.isOpen()) {
+        clearInterval(openCheckInterval);
+        facts.db('systemDB3').close(function(err){
+          rmdir('systemDB3', function(){
+            done();
+          });
+        });
+      }
+    })
   });
 
 });
