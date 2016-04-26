@@ -22,7 +22,7 @@ describe('System', function(){
           rmdir('systemDB3', function(){
             done();
           });
-        });
+        }, 100);
       }
     })
   });
