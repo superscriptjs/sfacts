@@ -37,10 +37,5 @@
     "Rob Ellis <rob@silentrob.me>",
     "John Wehr <johnwehr@gmail.com>"
   ],
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://raw.github.com/silentrob/sfacts/master/LICENSE"
-    }
-  ]
+  "license": "MIT"
 }
