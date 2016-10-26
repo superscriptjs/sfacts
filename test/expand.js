@@ -1,15 +1,14 @@
-var should  = require("should");
-var rmdir = require("rmdir");
-var facts = require("../");
-var gFacts;
+import should from 'should';
+import facts from '../';
 
-var data = ['./test/data/concepts_sm.top'];
+let gFacts;
 
-describe('Expand', function(){
+const data = ['./test/data/concepts_sm.top'];
 
-  before(function(done){
-    facts.load(data, 'expandDB', function(err, sfacts){
-      if(err) {
+describe('Expand', () => {
+  before((done) => {
+    facts.load(data, 'expandDB', (err, sfacts) => {
+      if (err) {
         return done(err);
       }
       gFacts = sfacts;
@@ -17,23 +16,14 @@ describe('Expand', function(){
     });
   });
 
-  it("should create a user database.", function() {
-    var userDB = gFacts.createUserDB("SOME_USER_ID");
+  it('should create a user database.', () => {
+    const userDB = gFacts.createUserDB('SOME_USER_ID');
   });
 
-  it("should create a user database with data", function(done) {
-    var files = ['./test/data/names.top'];
-    var userDBWithData = gFacts.createUserDBWithData("ANOTHER_USER_ID", files, function(err, db){
+  it('should create a user database with data', (done) => {
+    const files = ['./test/data/names.top'];
+    const userDBWithData = gFacts.createUserDBWithData('ANOTHER_USER_ID', files, (err, db) => {
       done(err);
     });
   });
-
-  after(function(done){
-    facts.db('expandDB').close(function(err){
-      rmdir('expandDB', function(){
-        done();
-      });
-    });
-  });
-
 });

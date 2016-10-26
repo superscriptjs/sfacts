@@ -1,30 +1,23 @@
-var rmdir = require("rmdir");
-var facts = require("../");
+import facts from '../';
 
-describe('System', function(){
-
-  it("should create a database.", function(done) {
-    facts.create('systemDB2', function(err){
-      facts.db('systemDB2').close(function(err){
-        rmdir('systemDB2', function(){
-          done();
-        });
+describe('System', () => {
+  it('should create a database.', (done) => {
+    facts.create('systemDB2', (err) => {
+      facts.db('systemDB2').close((err) => {
+        done();
       });
     });
   });
 
-  it("should create a database synchronously.", function(done) {
-    var db = facts.create('systemDB3');
-    var openCheckInterval = setInterval(function(){
-      if(db.db.isOpen()) {
+  it('should create a database synchronously.', (done) => {
+    const db = facts.create('systemDB3');
+    const openCheckInterval = setInterval(() => {
+      if (db.db.isOpen()) {
         clearInterval(openCheckInterval);
-        facts.db('systemDB3').close(function(err){
-          rmdir('systemDB3', function(){
-            done();
-          });
+        facts.db('systemDB3').close((err) => {
+          done();
         }, 100);
       }
-    })
+    });
   });
-
 });
