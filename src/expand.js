@@ -44,12 +44,15 @@ const expand = function expand(db, level) {
     }
 
     if (depth === 10) {
-      cb('DEPTH', null);
+      return cb('DEPTH', null);
     }
 
     db.search([
       { subject: term, predicate: 'example', object: db.v('concepts') },
     ], (err, results) => {
+      if (err) {
+        console.log(err);
+      }
       const itor = (itemx, next) => {
         // db.get({subject: itemx , predicate: 'isa', object: 'concept' },
         db.search([
@@ -58,6 +61,9 @@ const expand = function expand(db, level) {
             { subject: itemx, predicate: 'example', object: db.v('term') },
         ],
           (err, res2) => {
+            if (err) {
+              console.log(err);
+            }
             if (_.isEmpty(res2)) {
               next(null, itemx);
             } else if (itemx !== term) {
@@ -72,6 +78,9 @@ const expand = function expand(db, level) {
       const list = results.map(item => item.concepts);
 
       async.map(list, itor, (err, res) => {
+        if (err) {
+          console.log(err);
+        }
         const resultSet = _.uniq(_.flatten(res));
         cb(null, resultSet);
       });
@@ -82,6 +91,9 @@ const expand = function expand(db, level) {
     db.search([
       { subject: term, predicate: 'isa', object: db.v('concepts') },
     ], (err, results) => {
+      if (err) {
+        console.log(err);
+      }
       if (results.length !== 0) {
         const cl = results.map(item => item.concepts);
         cb(null, cl);

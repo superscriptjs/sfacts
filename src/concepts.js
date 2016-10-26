@@ -1,4 +1,3 @@
-// TODO - clean up this file, we only use one function.
 import fs from 'fs';
 import str from 'string';
 import _ from 'lodash';
@@ -16,9 +15,11 @@ class ConceptObj {
     this.db = db;
   }
 
-  createFact(subject, verb, object) {
+  createFact(subject, verb, object, callback) {
     debug('Creating new fact', subject, verb, object);
-    this.db.put({ subject, predicate: verb, object });
+    this.db.put({ subject, predicate: verb, object }, (err) => {
+      callback(err);
+    });
   }
 }
 
@@ -79,9 +80,9 @@ const readFile = function readFile(file, db, cb) {
 
   let factCount = 0;
 
-  const addFact = function addFact(def) {
+  const addFact = function addFact(def, callback) {
     if (factDef) {
-      for (let i = 0; i < factDef.length; i++) {
+      async.times(factDef.length, (i, next) => {
         if (factDef[i].length === 3) {
           const p0 = (def[factDef[i][0]]) ? def[factDef[i][0]] : factDef[i][0];
           const p1 = (def[factDef[i][1]]) ? def[factDef[i][1]] : factDef[i][1];
@@ -89,37 +90,47 @@ const readFile = function readFile(file, db, cb) {
 
           if (_.isArray(p0) || _.isArray(p2)) {
             if (_.isArray(p0)) {
-              for (i = 0; i < p0.length; i++) {
-                if (isConcept(p0[i])) c.referencedConcepts.pushUnique(prepConcept(p0[i]));
+              async.times(p0.length, (n, next2) => {
+                if (isConcept(p0[n])) c.referencedConcepts.pushUnique(prepConcept(p0[n]));
                 if (isConcept(p1)) c.referencedConcepts.pushUnique(prepConcept(p1));
                 if (isConcept(p2)) c.referencedConcepts.pushUnique(prepConcept(p2));
-                c.createFact(p0[i], p1, prepConcept(p2));
-                factCount += 1;
-              }
+                c.createFact(p0[n], p1, prepConcept(p2), (err) => {
+                  factCount += 1;
+                  next2(err);
+                });
+              }, (err) => {
+                next(err);
+              });
             }
             if (_.isArray(p2)) {
-              for (i = 0; i < p2.length; i++) {
+              async.times(p2.length, (n, next2) => {
                 if (isConcept(p0)) c.referencedConcepts.pushUnique(prepConcept(p0));
                 if (isConcept(p1)) c.referencedConcepts.pushUnique(prepConcept(p1));
-                if (isConcept(p2[i])) c.referencedConcepts.pushUnique(prepConcept(p2[i]));
-                c.createFact(p0, p1, prepConcept(p2[i]));
-                factCount += 1;
-              }
+                if (isConcept(p2[n])) c.referencedConcepts.pushUnique(prepConcept(p2[n]));
+                c.createFact(p0, p1, prepConcept(p2[n]), (err) => {
+                  factCount += 1;
+                  next2(err);
+                });
+              }, (err) => {
+                next(err);
+              });
             }
           } else {
             if (isConcept(p0)) c.referencedConcepts.pushUnique(prepConcept(p0));
             if (isConcept(p1)) c.referencedConcepts.pushUnique(prepConcept(p1));
             if (isConcept(p2)) c.referencedConcepts.pushUnique(prepConcept(p2));
 
-            c.createFact(p0, p1, prepConcept(p2));
-            factCount += 1;
+            c.createFact(p0, p1, prepConcept(p2), (err) => {
+              factCount += 1;
+              next(err);
+            });
           }
         }
-      }
+      }, err => callback(err));
     }
   };
 
-  const addTableData = function addTableData(line) {
+  const addTableData = function addTableData(line, callback) {
     let buff = [];
     let conceptsInBraces = false;
     let inQuotes = false;
@@ -157,7 +168,9 @@ const readFile = function readFile(file, db, cb) {
             i += 1;
             buff = [];
             if (i === tableArgs.length) {
-              addFact(data);
+              addFact(data, (err) => {
+                // TODO: Fill this out
+              });
             }
           }
         }
@@ -173,7 +186,9 @@ const readFile = function readFile(file, db, cb) {
         i += 1;
 
         if (i === tableArgs.length) {
-          addFact(data);
+          addFact(data, (err) => {
+            // TODO: Fill this out
+          });
         }
       }
     }
@@ -205,8 +220,12 @@ const readFile = function readFile(file, db, cb) {
         if (nconcept !== '' && conceptName) {
           const cleanConcept = prepConcept(conceptName);
           const cleanRel = prepConcept(nconcept);
-          c.createFact(cleanConcept, 'example', cleanRel);
-          c.createFact(cleanRel, 'isa', cleanConcept);
+          c.createFact(cleanConcept, 'example', cleanRel, (err) => {
+            // TODO: Fill this out
+          });
+          c.createFact(cleanRel, 'isa', cleanConcept, (err) => {
+            // TODO: Fill this out
+          });
         }
         buff = [];
       }
@@ -256,7 +275,7 @@ const readFile = function readFile(file, db, cb) {
         if (inTableData) {
             // Skip comments
           if (nline.indexOf('#') === -1) {
-            addTableData(nline.s);
+            addTableData(nline.s, () => {});
           }
         } else if (nline.indexOf('^createfact') === 0) {
           factDef.push((str(nline).between('(', ')').trim()).split(' '));
@@ -307,13 +326,18 @@ Array.prototype.pushUnique = function (item) {
 // This is the same as read file, but it reads an array of files
 const readFiles = function readFiles(files, db, callback) {
   const itor = (file, next) => {
-    readFile(file, db, (con) => {
+    readFile(file, db, (conceptObj) => {
       // Add the reference concepts
-      for (let i = 0; i < con.referencedConcepts.length; i++) {
-        con.createFact(con.referencedConcepts[i], 'isa', 'concept');
-      }
-
-      next(null, con);
+      async.times(conceptObj.referencedConcepts.length, (n, next2) => {
+        conceptObj.createFact(conceptObj.referencedConcepts[n], 'isa', 'concept', (err) => {
+          next2(err);
+        });
+      }, (err) => {
+        if (err) {
+          console.log(err);
+        }
+        next(null, conceptObj);
+      });
     });
   };
 
