@@ -82,7 +82,7 @@ const readFile = function readFile(file, db, cb) {
 
   const addFact = function addFact(def, callback) {
     if (factDef) {
-      async.times(factDef.length, (i, next) => {
+      async.timesSeries(factDef.length, (i, next) => {
         if (factDef[i].length === 3) {
           const p0 = (def[factDef[i][0]]) ? def[factDef[i][0]] : factDef[i][0];
           const p1 = (def[factDef[i][1]]) ? def[factDef[i][1]] : factDef[i][1];
@@ -90,7 +90,7 @@ const readFile = function readFile(file, db, cb) {
 
           if (_.isArray(p0) || _.isArray(p2)) {
             if (_.isArray(p0)) {
-              async.times(p0.length, (n, next2) => {
+              async.timesSeries(p0.length, (n, next2) => {
                 if (isConcept(p0[n])) c.referencedConcepts.pushUnique(prepConcept(p0[n]));
                 if (isConcept(p1)) c.referencedConcepts.pushUnique(prepConcept(p1));
                 if (isConcept(p2)) c.referencedConcepts.pushUnique(prepConcept(p2));
@@ -103,7 +103,7 @@ const readFile = function readFile(file, db, cb) {
               });
             }
             if (_.isArray(p2)) {
-              async.times(p2.length, (n, next2) => {
+              async.timesSeries(p2.length, (n, next2) => {
                 if (isConcept(p0)) c.referencedConcepts.pushUnique(prepConcept(p0));
                 if (isConcept(p1)) c.referencedConcepts.pushUnique(prepConcept(p1));
                 if (isConcept(p2[n])) c.referencedConcepts.pushUnique(prepConcept(p2[n]));
@@ -138,44 +138,46 @@ const readFile = function readFile(file, db, cb) {
     let i = 0;
     const data = {};
     let nconcept;
-    if (line !== '') {
-      for (let n = 0; n < line.length; n++) {
-        if (/[~a-z0-9-._']/i.test(line[n]) || inQuotes || inBraces) {
-          buff.push(line[n]);
-          if (line[n] === '"') {
-            inQuotes = false;
-            buff.pop();
-          } else if (line[n] === ']') {
-            inBraces = false;
-            buff.pop();
-          }
-        } else if (line[n] === '"') {
-          inQuotes = true;
-        } else if (line[n] === '[') {
-          inBraces = true;
-          conceptsInBraces = true;
-        } else {
-          // If there's a space and we're not within quotes or braces
-          nconcept = buff.join('');
+    if (line === '') {
+      return callback(null);
+    }
+    async.timesSeries(line.length, (n, next) => {
+      if (/[~a-z0-9-._']/i.test(line[n]) || inQuotes || inBraces) {
+        buff.push(line[n]);
+        if (line[n] === '"') {
+          inQuotes = false;
+          buff.pop();
+        } else if (line[n] === ']') {
+          inBraces = false;
+          buff.pop();
+        }
+      } else if (line[n] === '"') {
+        inQuotes = true;
+      } else if (line[n] === '[') {
+        inBraces = true;
+        conceptsInBraces = true;
+      } else {
+        // If there's a space and we're not within quotes or braces
+        nconcept = buff.join('');
 
-          if (nconcept !== '') {
-            if (conceptsInBraces) {
-              data[tableArgs[i]] = parseArray(nconcept);
-            } else {
-              data[tableArgs[i]] = nconcept;
-            }
-            conceptsInBraces = false;
-            i += 1;
-            buff = [];
-            if (i === tableArgs.length) {
-              addFact(data, (err) => {
-                // TODO: Fill this out
-              });
-            }
+        if (nconcept !== '') {
+          if (conceptsInBraces) {
+            data[tableArgs[i]] = parseArray(nconcept);
+          } else {
+            data[tableArgs[i]] = nconcept;
+          }
+          conceptsInBraces = false;
+          i += 1;
+          buff = [];
+          if (i === tableArgs.length) {
+            return addFact(data, (err) => {
+              next(err);
+            });
           }
         }
       }
-
+      next(null);
+    }, (err) => {
       if (buff.length !== 0) {
         nconcept = buff.join('');
         if (conceptsInBraces) {
@@ -186,16 +188,18 @@ const readFile = function readFile(file, db, cb) {
         i += 1;
 
         if (i === tableArgs.length) {
-          addFact(data, (err) => {
-            // TODO: Fill this out
+          return addFact(data, (err) => {
+            callback(err);
           });
         }
+        return callback(err);
       }
-    }
+      return callback(err);
+    });
   };
 
   // Adds the Concept line, minus the main concept
-  const addConcepts = function addConcepts(conceptName, line) {
+  const addConcepts = function addConcepts(conceptName, line, callback) {
     let buff = [];
     let inQuotes = false;
     const l2 = str(line).between('(');
@@ -206,7 +210,7 @@ const readFile = function readFile(file, db, cb) {
       eol = comment - 1;
     }
 
-    for (let n = 0; n < eol; n++) {
+    async.timesSeries(eol, (n, next) => {
       if (/[~a-z0-9-_']/i.test(l2.s[n]) || inQuotes) {
         buff.push(l2.s[n]);
         if (l2.s[n] === '"') {
@@ -217,30 +221,44 @@ const readFile = function readFile(file, db, cb) {
         inQuotes = true;
       } else {
         const nconcept = buff.join('');
+        buff = [];
         if (nconcept !== '' && conceptName) {
           const cleanConcept = prepConcept(conceptName);
           const cleanRel = prepConcept(nconcept);
-          c.createFact(cleanConcept, 'example', cleanRel, (err) => {
-            // TODO: Fill this out
-          });
-          c.createFact(cleanRel, 'isa', cleanConcept, (err) => {
-            // TODO: Fill this out
+          return c.createFact(cleanConcept, 'example', cleanRel, (err) => {
+            c.createFact(cleanRel, 'isa', cleanConcept, (err) => {
+              if (err) {
+                console.log(err);
+              }
+              next(err);
+            });
           });
         }
-        buff = [];
       }
-    }
+      return next(null);
+    }, (err) => {
+      if (err) {
+        console.log(err);
+      }
+      callback(err);
+    });
   };
 
   const input = fs.createReadStream(file);
   let remaining = '';
   let currentConcept;
 
+  // This exists so that the 'end' handler doesn't fire until all the callbacks
+  // from the 'data' handler have finished.
+  let callbackComplete = false;
+
   input.on('data', (data) => {
     remaining += data;
-    let index = remaining.indexOf('\n');
 
-    while (index > -1) {
+    // This is async since it can potentially call addTableData or addConcepts
+    async.whilst(() => (remaining.indexOf('\n') > -1), (callback) => {
+      const index = remaining.indexOf('\n');
+
       const line = remaining.substring(0, index);
       remaining = remaining.substring(index + 1);
 
@@ -256,10 +274,10 @@ const readFile = function readFile(file, db, cb) {
         }
 
         currentConcept = findOrCreateConcept(str(conceptName));
-        addConcepts(currentConcept, nline);
+        return addConcepts(currentConcept, nline, callback);
       } else if (currentConcept) {
         // Otherwise continue with the currently importing concept (more to import)
-        addConcepts(currentConcept, nline);
+        return addConcepts(currentConcept, nline, callback);
       } else if (nline.indexOf('table:') === 0) {
         // Reset the Fact Tables
         factDef = [];
@@ -270,48 +288,58 @@ const readFile = function readFile(file, db, cb) {
         c.tables.pushUnique(prepConcept(conceptName));
         tableArgs = (str(nline).between('(', ')').trim()).split(' ').filter(e => e);
         debug('TableArgs', tableArgs);
-      } else {
-          // Deliberatly skip the check (missing the DATA line)
-        if (inTableData) {
-            // Skip comments
-          if (nline.indexOf('#') === -1) {
-            addTableData(nline.s, () => {});
-          }
-        } else if (nline.indexOf('^createfact') === 0) {
-          factDef.push((str(nline).between('(', ')').trim()).split(' '));
-          debug('factDef', factDef);
+      } else if (inTableData) {
+        // Skip comments
+        if (nline.indexOf('#') === -1) {
+          return addTableData(nline.s, callback);
         }
-
-        const tableData = nline.indexOf('DATA:');
-        if (tableData === 0) {
-          inTableData = true;
-        }
+      } else if (nline.indexOf('^createfact') === 0) {
+        factDef.push((str(nline).between('(', ')').trim()).split(' '));
+        debug('factDef', factDef);
+      } else if (nline.indexOf('DATA:') === 0) {
+        inTableData = true;
       }
-      index = remaining.indexOf('\n');
-    }
+      return callback(null);
+    }, (err) => {
+      if (err) {
+        console.log(err);
+      }
+      callbackComplete = true;
+    });
   });
 
   input.on('end', () => {
-    if (remaining.length > 0) {
-      const nline = str(remaining).trimLeft();
+    // Wait for callbacks in 'data' handler to finish.
+    async.whilst(() => (!callbackComplete), (callback) => {
+      setTimeout(() => callback(), 100);
+    }, () => {
+      if (remaining.length > 0) {
+        const nline = str(remaining).trimLeft();
 
-      if (nline.indexOf('concept:') === 0) {
-        let conceptName = str(nline).between('concept:', '(').trim();
-        // Some lines have extra leading descriptors
-        conceptName = conceptName.split(' ')[0];
+        if (nline.indexOf('concept:') === 0) {
+          let conceptName = str(nline).between('concept:', '(').trim();
+          // Some lines have extra leading descriptors
+          conceptName = conceptName.split(' ')[0];
 
-        if (isConcept(conceptName)) {
-          c.highLevelConcepts.pushUnique(prepConcept(conceptName));
+          if (isConcept(conceptName)) {
+            c.highLevelConcepts.pushUnique(prepConcept(conceptName));
+          }
+
+          currentConcept = findOrCreateConcept(str(conceptName));
+          return addConcepts(currentConcept, nline, () => {
+            debug('Added # Facts', factCount);
+            cb(c);
+          });
         }
 
-        currentConcept = findOrCreateConcept(str(conceptName));
-        addConcepts(currentConcept, nline);
-      } else {
-        addConcepts(currentConcept, nline);
+        return addConcepts(currentConcept, nline, () => {
+          debug('Added # Facts', factCount);
+          cb(c);
+        });
       }
-    }
-    debug('Added # Facts', factCount);
-    cb(c);
+      debug('Added # Facts', factCount);
+      return cb(c);
+    });
   });
 };
 
