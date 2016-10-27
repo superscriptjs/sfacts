@@ -1,5 +1,5 @@
 import should from 'should';
-import facts from '../';
+import facts from '../src/system';
 
 let gFacts;
 

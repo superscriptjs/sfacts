@@ -1,4 +1,4 @@
-import facts from '../';
+import facts from '../src/system';
 
 describe('System', () => {
   it('should create a database.', (done) => {

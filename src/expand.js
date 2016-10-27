@@ -15,7 +15,6 @@ const expand = function expand(db, level) {
 
     const graph = levelGraph(graphLevel);
 
-    // return graph;
     return expand(graph);
   };
 
@@ -27,7 +26,7 @@ const expand = function expand(db, level) {
 
     const graph = levelGraph(graphLevel);
 
-    concepts.readFiles(files, graph, (err, db2) => {
+    concepts.readFiles(files, graph, (err, conceptMap) => {
       cb(err, expand(graph));
     });
   };
