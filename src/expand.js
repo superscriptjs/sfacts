@@ -6,10 +6,10 @@ import concepts from './concepts';
 
 // We wrap the DB with extra functions.
 const expand = function expand(db, level) {
-  const createUserDB = function createUserDB(dbname) {
+  const createUserDB = function createUserDB(dbName) {
     // With Hooks
     const sub = levelSublevel(level);
-    const graphLevel = sub.sublevel(dbname);
+    const graphLevel = sub.sublevel(dbName);
     graphLevel.db = level.db;
     graphLevel.approximateSize = level.db.approximateSize.bind(level.db);
 
@@ -18,9 +18,9 @@ const expand = function expand(db, level) {
     return expand(graph);
   };
 
-  const createUserDBWithData = function createUserDBWithData(dbname, files, cb) {
+  const createUserDBWithData = function createUserDBWithData(dbName, files, cb) {
     const sub = levelSublevel(level);
-    const graphLevel = sub.sublevel(dbname);
+    const graphLevel = sub.sublevel(dbName);
     graphLevel.db = level.db;
     graphLevel.approximateSize = level.db.approximateSize.bind(level.db);
 
@@ -32,7 +32,7 @@ const expand = function expand(db, level) {
   };
 
   // This adds a file to an existing DB
-  const loadFile = function loadFile(files, cb) {
+  const loadFiles = function loadFiles(files, cb) {
     concepts.readFiles(files, db, cb);
   };
 
@@ -104,12 +104,12 @@ const expand = function expand(db, level) {
 
   return {
     conceptToList,
-    findParentConcepts,
-    db,
-    level,
     createUserDB,
     createUserDBWithData,
-    loadFile,
+    db,
+    findParentConcepts,
+    level,
+    loadFiles,
   };
 };
 

@@ -62,7 +62,7 @@ describe('Substitution Interface', () => {
 
     it('load new file', (done) => {
       const files = ['./test/data/names.top'];
-      gFacts.loadFile(files, (err, concept) => {
+      gFacts.loadFiles(files, (err, concept) => {
         if (err) {
           return done(err);
         }

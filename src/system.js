@@ -34,12 +34,7 @@ const load = function load(files, dbName, cb) {
   });
 };
 
-const db = function db(dbName) {
-  return levelGraph(dbName);
-};
-
 export default {
   create,
-  db,
   load,
 };

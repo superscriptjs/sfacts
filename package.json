@@ -5,7 +5,7 @@
   "main": "lib/system.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/silentrob/sfacts"
+    "url": "https://github.com/superscriptjs/sfacts"
   },
   "dependencies": {
     "async": "^2.1.2",

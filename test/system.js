@@ -2,8 +2,8 @@ import facts from '../src/system';
 
 describe('System', () => {
   it('should create a database.', (done) => {
-    facts.create('systemDB2', (err) => {
-      facts.db('systemDB2').close((err) => {
+    facts.create('systemDB2', (err, db) => {
+      db.db.close((err) => {
         done();
       });
     });
@@ -14,7 +14,7 @@ describe('System', () => {
     const openCheckInterval = setInterval(() => {
       if (db.db.isOpen()) {
         clearInterval(openCheckInterval);
-        facts.db('systemDB3').close((err) => {
+        db.db.close((err) => {
           done();
         }, 100);
       }
