@@ -6,6 +6,14 @@ import debuglog from 'debug';
 
 const debug = debuglog('Concept');
 
+const pushUnique = function pushUnique(array, item) {
+  if (array.indexOf(item) === -1) {
+    array.push(item);
+    return true;
+  }
+  return false;
+};
+
 class ConceptObj {
   constructor(db, name = 'no-name') {
     this.name = name;
@@ -43,7 +51,7 @@ const readFile = function readFile(file, db, cb) {
 
   const findOrCreateConcept = function findOrCreateConcept(term) {
     if (isConcept(term)) {
-      c.referencedConcepts.pushUnique(prepConcept(term));
+      pushUnique(c.referencedConcepts, prepConcept(term));
     }
 
     const nc = term.chompLeft('~').toLowerCase().trim();
@@ -91,9 +99,9 @@ const readFile = function readFile(file, db, cb) {
           if (_.isArray(p0) || _.isArray(p2)) {
             if (_.isArray(p0)) {
               async.timesSeries(p0.length, (n, next2) => {
-                if (isConcept(p0[n])) c.referencedConcepts.pushUnique(prepConcept(p0[n]));
-                if (isConcept(p1)) c.referencedConcepts.pushUnique(prepConcept(p1));
-                if (isConcept(p2)) c.referencedConcepts.pushUnique(prepConcept(p2));
+                if (isConcept(p0[n])) pushUnique(c.referencedConcepts, prepConcept(p0[n]));
+                if (isConcept(p1)) pushUnique(c.referencedConcepts, prepConcept(p1));
+                if (isConcept(p2)) pushUnique(c.referencedConcepts, prepConcept(p2));
                 c.createFact(p0[n], p1, prepConcept(p2), (err) => {
                   factCount += 1;
                   next2(err);
@@ -104,9 +112,9 @@ const readFile = function readFile(file, db, cb) {
             }
             if (_.isArray(p2)) {
               async.timesSeries(p2.length, (n, next2) => {
-                if (isConcept(p0)) c.referencedConcepts.pushUnique(prepConcept(p0));
-                if (isConcept(p1)) c.referencedConcepts.pushUnique(prepConcept(p1));
-                if (isConcept(p2[n])) c.referencedConcepts.pushUnique(prepConcept(p2[n]));
+                if (isConcept(p0)) pushUnique(c.referencedConcepts, prepConcept(p0));
+                if (isConcept(p1)) pushUnique(c.referencedConcepts, prepConcept(p1));
+                if (isConcept(p2[n])) pushUnique(c.referencedConcepts, prepConcept(p2[n]));
                 c.createFact(p0, p1, prepConcept(p2[n]), (err) => {
                   factCount += 1;
                   next2(err);
@@ -116,9 +124,9 @@ const readFile = function readFile(file, db, cb) {
               });
             }
           } else {
-            if (isConcept(p0)) c.referencedConcepts.pushUnique(prepConcept(p0));
-            if (isConcept(p1)) c.referencedConcepts.pushUnique(prepConcept(p1));
-            if (isConcept(p2)) c.referencedConcepts.pushUnique(prepConcept(p2));
+            if (isConcept(p0)) pushUnique(c.referencedConcepts, prepConcept(p0));
+            if (isConcept(p1)) pushUnique(c.referencedConcepts, prepConcept(p1));
+            if (isConcept(p2)) pushUnique(c.referencedConcepts, prepConcept(p2));
 
             c.createFact(p0, p1, prepConcept(p2), (err) => {
               factCount += 1;
@@ -270,7 +278,7 @@ const readFile = function readFile(file, db, cb) {
         conceptName = conceptName.split(' ')[0];
 
         if (isConcept(conceptName)) {
-          c.highLevelConcepts.pushUnique(prepConcept(conceptName));
+          pushUnique(c.highLevelConcepts, prepConcept(conceptName));
         }
 
         currentConcept = findOrCreateConcept(str(conceptName));
@@ -285,7 +293,7 @@ const readFile = function readFile(file, db, cb) {
         let conceptName = str(nline).between('table:', '(').trim();
         conceptName = conceptName.split(' ')[0];
         debug('Table', conceptName);
-        c.tables.pushUnique(prepConcept(conceptName));
+        pushUnique(c.tables, prepConcept(conceptName));
         tableArgs = (str(nline).between('(', ')').trim()).split(' ').filter(e => e);
         debug('TableArgs', tableArgs);
       } else if (inTableData) {
@@ -322,7 +330,7 @@ const readFile = function readFile(file, db, cb) {
           conceptName = conceptName.split(' ')[0];
 
           if (isConcept(conceptName)) {
-            c.highLevelConcepts.pushUnique(prepConcept(conceptName));
+            pushUnique(c.highLevelConcepts, prepConcept(conceptName));
           }
 
           currentConcept = findOrCreateConcept(str(conceptName));
@@ -341,14 +349,6 @@ const readFile = function readFile(file, db, cb) {
       return cb(c);
     });
   });
-};
-
-Array.prototype.pushUnique = function (item) {
-  if (this.indexOf(item) === -1) {
-    this.push(item);
-    return true;
-  }
-  return false;
 };
 
 // This is the same as read file, but it reads an array of files

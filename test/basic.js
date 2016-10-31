@@ -7,7 +7,7 @@ const data = ['./test/data/concepts_sm.top', './test/data/animals.tbl'];
 
 describe('Substitution Interface', () => {
   before((done) => {
-    facts.load(data, 'systemDB', (err, sfacts) => {
+    facts.load('systemDB', data, false, (err, sfacts) => {
       if (err) {
         return done(err);
       }

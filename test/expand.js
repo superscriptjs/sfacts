@@ -7,7 +7,7 @@ const data = ['./test/data/concepts_sm.top'];
 
 describe('Expand', () => {
   before((done) => {
-    facts.load(data, 'expandDB', (err, sfacts) => {
+    facts.load('expandDB', data, false, (err, sfacts) => {
       if (err) {
         return done(err);
       }

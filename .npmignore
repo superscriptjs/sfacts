@@ -4,3 +4,7 @@ logs/*
 npm-debug.log
 src/*
 test/*
+.babelrc
+.eslintrc
+.travis.yml
+readme.md

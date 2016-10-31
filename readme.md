@@ -12,12 +12,15 @@ Note: Before v1.0.0, sfacts used to write to the filesystem using LevelDB. It no
 
 ## API
 
-* `create(dbName, callback)`
-* `load(files, dbName, callback)`
+* `clean(dbName, callback)`
+* `create(dbName, clean, callback)`
+* `load(dbName, files, clean, callback)`
 
-Note: The methods pre-v1.0.0 `db` and `expand` are no longer available.
+The boolean parameter `clean` in the `create` and `load` methods wipes the existing database if it exists, before creating a new one.
 
-The return value of each of the above methods is an object:
+Note: The methods pre-v1.0.0 `db` and `expand` are no longer available. The function signatures `create` and `load` have changed, and now are required to be called asynchronously (i.e. has a callback parameter).
+
+The return value of `create` and `load` is an object:
 
 * `conceptToList(term, [depth,] callback)`
 * `createUserDB(dbName)`
