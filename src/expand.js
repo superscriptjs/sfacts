@@ -15,7 +15,7 @@ const expand = function expand(db, level) {
 
     const graph = levelGraph(graphLevel);
 
-    return expand(graph);
+    return expand(graph, graphLevel);
   };
 
   const createUserDBWithData = function createUserDBWithData(dbName, files, cb) {
@@ -27,7 +27,7 @@ const expand = function expand(db, level) {
     const graph = levelGraph(graphLevel);
 
     concepts.readFiles(files, graph, (err, conceptMap) => {
-      cb(err, expand(graph));
+      cb(err, expand(graph, graphLevel));
     });
   };
 
