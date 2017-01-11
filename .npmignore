@@ -1,0 +1,10 @@
+.DS_Store
+node_modules/*
+logs/*
+npm-debug.log
+src/*
+test/*
+.babelrc
+.eslintrc
+.travis.yml
+readme.md
