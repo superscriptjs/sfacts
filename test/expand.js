@@ -1,3 +1,4 @@
+/* global describe before it */
 import should from 'should';
 import facts from '../src/system';
 
@@ -17,12 +18,12 @@ describe('Expand', () => {
   });
 
   it('should create a user database.', () => {
-    const userDB = gFacts.createUserDB('SOME_USER_ID');
+    gFacts.createUserDB('SOME_USER_ID');
   });
 
   it('should create a user database with data', (done) => {
     const files = ['./test/data/names.top'];
-    const userDBWithData = gFacts.createUserDBWithData('ANOTHER_USER_ID', files, (err, db) => {
+    gFacts.createUserDBWithData('ANOTHER_USER_ID', files, (err, db) => {
       done(err);
     });
   });

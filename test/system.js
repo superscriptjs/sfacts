@@ -1,3 +1,4 @@
+/* global describe before it */
 import facts from '../src/system';
 
 describe('System', () => {

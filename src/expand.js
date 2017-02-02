@@ -70,7 +70,7 @@ const expand = function expand(db, level) {
             } else {
               next(null, itemx);
             }
-          }
+          },
         );
       };
 

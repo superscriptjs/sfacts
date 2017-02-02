@@ -1,3 +1,4 @@
+/* global describe before it */
 import should from 'should';
 import facts from '../src/system';
 
@@ -7,7 +8,7 @@ const data = ['./test/data/concepts_sm.top', './test/data/animals.tbl'];
 
 describe('Substitution Interface', () => {
   before((done) => {
-    facts.load('systemDB', data, false, (err, sfacts) => {
+    facts.load('systemDB', data, true, (err, sfacts) => {
       if (err) {
         return done(err);
       }
