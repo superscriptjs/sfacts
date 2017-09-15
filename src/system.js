@@ -8,9 +8,10 @@ import expand from './expand';
 
 const clean = function clean(dbName, cb) {
   const db = mongojs(dbName);
-  db.dropDatabase((err) => {
+  db.mongodown.drop((success) => {
+    const err = success ? null : 'Nothing cleaned. There was no mongodown collection in ' + dbName;
     db.close();
-    cb(err);
+    cb(!success);
   });
 };
 
@@ -26,7 +27,7 @@ const create = function create(dbName, cleanDb, cb) {
   if (cleanDb) {
     return clean(dbName, (err) => {
       if (err) {
-        return cb(err);
+        console.log(err);
       }
       return postClean();
     });
